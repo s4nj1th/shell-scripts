@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cmd=$(echo "" | dmenu -p "Type a command:")
+
+if [ -n "$cmd" ]; then
+    # Execute the typed command in a separate process
+    bash -c "$cmd"
+else
+    # Handle empty input (user pressed ESC or canceled)
+    echo "No command selected."
+fi

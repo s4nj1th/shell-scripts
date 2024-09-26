@@ -1,0 +1,5 @@
+#!/bin/sh
+
+qrencode "$1" -o ~/pix/qr/$(date +%s).png
+
+sxiv ~/pix/qr/$(date +%s).png

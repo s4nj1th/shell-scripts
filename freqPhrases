@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# target=$(cat $HOME/.local/share/freqPhrases/phrases | dmenu -i -l 20 | cut -d ' ' -f 1)
+# if [[ -n $target ]] then
+# 	xdotool type $target;
+# fi
+
+# Check if the session is Wayland or Xorg
+if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+    # Wayland specific commands
+    # target=$(cat $HOME/.local/share/freqPhrases/phrases | tofi --dmenu --insensitive --lines=20 | cut -d ' ' -f 1)
+    # if [ -n "$target" ]; then
+    #     # echo -n "$target" | wtype
+    #     # wl-paste
+    #     # ydotool type "$target"
+    #     wtype "$target"
+    # fi
+    target=$(cat $HOME/.local/share/freqPhrases/phrases | tofi -c ~/.config/tofi/configB | cut -d ' ' -f 1)
+    wtype $target
+    # wtype $(cat $HOME/.local/share/freqPhrases/phrases | tofi -c ~/.config/tofi/configB | cut -d ' ' -f 1)
+
+elif [ "$XDG_SESSION_TYPE" = "x11" ]; then
+    # Xorg specific commands
+    target=$(cat $HOME/.local/share/freqPhrases/phrases | dmenu -i -l 20 | cut -d ' ' -f 1)
+    if [ -n "$target" ]; then
+        xdotool type "$target"
+    fi
+fi

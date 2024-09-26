@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Check if the session is Wayland or Xorg
+if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+  input=$(cat /dev/null | tofi -c $HOME/.config/tofi/configS --require-match=false)
+elif [ "$XDG_SESSION_TYPE" = "x11" ]; then
+    # Xorg specific commands
+    target=$(cat /dev/null | dmenu -i)
+fi
+
+if [ -n "$input" ]; then
+    $BROWSER "https://ddg.gg/?q=$input"
+fi
