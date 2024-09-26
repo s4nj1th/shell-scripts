@@ -14,7 +14,7 @@ if [ "$XDG_SESSION_TYPE" = wayland ]; then
           conStat=$(nmcli dev wifi connect "$wifiSSID" password "$wifiPass")
       fi
     else
-      echo "" | timeout 1 tofi -c ~/.config/tofi/configW --prompt-text "Aborted"
+      echo "" | timeout 1 tofi -c ~/.config/tofi/configW --prompt-text "Aborted\!"
   fi
 
 else
