@@ -1,0 +1,27 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+  echo "No file provided."
+  exit 1
+fi
+
+fileNameIn="$1"
+fileName="${fileNameIn%.*}"
+
+mkdir output/ >/dev/null 2>&1 || cat /dev/null
+
+rustc "$fileNameIn" -o "output/$fileName.out"
+
+if [ $? -eq 0 ]; then
+  echo -e "Succesfully compiled. O/P: output/$fileName.out"
+  read -p "Run it? [Y/n]: " choice
+  echo ""
+  if [ "$choice" = "n" ] || [ "$choice" = "N" ]; then
+    echo -e "\n\033[1;32mExited.\033[0m"
+  else
+    ./output/"$fileName.out"
+    echo -e "\n\033[1;32mProgram ran.\033[0m"
+  fi
+else
+  echo -e "\n\033[1;31mCompilation failed.\033[0m"
+fi
