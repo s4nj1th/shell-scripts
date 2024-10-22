@@ -1,0 +1,46 @@
+#!/bin/sh
+
+CONFIG_FILE_HYPR="$HOME/.config/hypr/hyprland.conf"
+
+if [[ "$1" == "see" ]]; then
+
+  if grep -q "kb_options = ctrl:nocaps" "$CONFIG_FILE_HYPR"; then
+    echo "Ctrl"
+  else
+    echo "Caps"
+  fi
+
+elif [[ "$1" == "ctrl" ]]; then
+
+  if grep -q "kb_options = ctrl:nocaps" "$CONFIG_FILE_HYPR"; then
+    echo "Ctrl"
+  else
+    sed -i 's/kb_options =/kb_options = ctrl:nocaps/' "$CONFIG_FILE_HYPR"
+    echo "Ctrl"
+  fi
+  hyprctl reload >/dev/null
+
+elif [[ "$1" == "caps" ]]; then
+
+  if grep -q "kb_options = ctrl:nocaps" "$CONFIG_FILE_HYPR"; then
+    sed -i 's/kb_options = ctrl:nocaps/kb_options =/' "$CONFIG_FILE_HYPR"
+    echo "Caps"
+  else
+    echo "Caps"
+  fi
+  hyprctl reload >/dev/null
+
+else
+
+  if grep -q "kb_options = ctrl:nocaps" "$CONFIG_FILE_HYPR"; then
+    sed -i 's/kb_options = ctrl:nocaps/kb_options =/' "$CONFIG_FILE_HYPR"
+    echo "Caps Lock: Normal"
+
+  else
+    # Set Caps Lock to Ctrl
+    sed -i 's/kb_options =/kb_options = ctrl:nocaps/' "$CONFIG_FILE_HYPR"
+    echo "Caps Lock: Ctrl"
+  fi
+  hyprctl reload >/dev/null
+
+fi
