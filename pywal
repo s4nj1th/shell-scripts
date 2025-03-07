@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# Specify the directory path
+DIR="$HOME/pix/wall/pc/faves/"
+
+# Check if the directory exists
+if [ ! -d "$DIR" ]; then
+  echo "Directory $DIR does not exist."
+  exit 1
+fi
+
+# if [[ $(cat $HOME/.config/theme/cur) == "light" ]]; then
+#   light=-l
+# fi
+
+# Initialize an empty array to store the file names
+
+files=()
+cmd=""
+
+# Iterate over all items in the director#y
+for file in "$DIR"/*; do
+  # Check if the item is a file (not a directory)
+  if [ -f "$file" ]; then
+    # Add the file name to the array
+    files+=("$file")
+    cmd=$cmd"$file\0icon\x1f$file\n"
+  fi
+done
+
+# Execute the Rofi command
+if [ "$1" = "" ]; then
+  file="$DIR$(ls "$DIR" | tofi -c "$HOME/.config/tofi/config" --prompt-text "Select file: ")"
+  # file=$HOME/pix/wall/pc/faves/evangelion6720p.png
+  if [[ "$file" == "${DIR}" ]]; then
+    file=$(find "${DIR}" -type f | shuf -n 1)
+  fi
+
+else
+  if [ $1 = "rand" ]; then
+    file=$(find "${DIR}" -type f | shuf -n 1)
+  else
+    file="$DIR/$1"
+  fi
+fi
+
+ln -sf "$file" ~/.config/hypr/bg.png
+
+# echo "${file#$DIR/}" >"$HOME/.config/theme/bg"
+
+if [[ -n $file ]]; then
+  # Access and print the file at the calculated index
+  # echo "Switching background."
+
+  if pgrep hyprpaper > /dev/null; then
+      killall hyprpaper >/dev/null
+      hyprpaper &
+      disown >/dev/null
+  fi
+
+  # echo "Setting Color Scheme"
+  wal -i "$file" -n -a 90 $light >/dev/null
+
+  ln -sf ~/.cache/wal/dunstrc ~/.config/dunst/dunstrc
+
+  if pgrep dunst > /dev/null; then
+    killall dunst
+    dunst & disown > /dev/null
+  fi
+
+  notify-send "Pywal" "$(basename $file)" -i "$file" -a 'System' >/dev/null
+
+  waybarpath="$HOME/.config/waybar/style.css"
+  # echo "Reloading waybar"
+  touch "$waybarpath" -m >/dev/null
+
+  if pgrep waybar > /dev/null; then
+    killall waybar
+    waybar &
+    disown >/dev/null
+  fi
+
+  # echo "Changing BetterDiscord theme."
+  # pywal-discord >/dev/null
+
+  # echo "Changing Oomox theme (GTK + QT)"
+  # oomox-cli -o oomox ~/.cache/wal/colors-oomox >/dev/null
+  # gsettings set org.gnome.desktop.interface gtk-theme 'oomox' >/dev/null
+
+  # echo "Changing Firefox theme."
+  # pywalfox update >/dev/null
+
+  # echo "Changing foot theme."
+
+  # echo "Changing Hyprland Colors."
+
+  # echo "Changing Telegram theme."
+  walogram -B >/dev/null
+
+else
+  notify-send "Pywal" "Cancelled" -a 'System'
+
+fi
