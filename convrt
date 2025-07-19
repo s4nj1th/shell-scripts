@@ -40,18 +40,20 @@ fi
 process_file() {
   local input_file="$1"
   local output_file="${input_file%.*}.$output_ext"
+  local ip=$(basename "$input_file")
+  local op=$(basename "$output_file")
   
-  echo "Converting: $(basename $input_file) -> $(basename $output_file)"
+  echo "Converting: $ip -> $op"
   ffmpeg -i "$input_file" "$output_file" -loglevel quiet
-  
+
   if [ $? -eq 0 ]; then
-    echo "Successfully converted $(basename $input_file)"
+    echo "Successfully converted $ip"
     if [ $remove_original -eq 1 ]; then
       rm "$input_file"
-      echo "Removed original file: $(basename $input_file)"
+      echo "Removed original file: $ip"
     fi
   else
-    echo "Error converting $(basename $input_file)" >&2
+    echo "Error converting $ip" >&2
     return 1
   fi
 }
