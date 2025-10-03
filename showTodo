@@ -1,0 +1,24 @@
+#!/bin/bash
+
+echo ""
+NOTE_DIR="$HOME/Documents/obsidian/default/00 - daily"
+TODAY=$(date +%F)
+NOTE_FILE="$NOTE_DIR/$TODAY.md"
+
+GREY="\x1b[90m"
+RESET="\x1b[0m"
+BOLD="\x1b[1m"
+
+if [ ! -f "$NOTE_FILE" ]; then
+    echo "No note found for $TODAY at $NOTE_FILE"
+    exit 1
+fi
+
+TODO_SECTION=$(awk '/^## todo/{flag=1; next} /^$/{if(flag) exit} flag' "$NOTE_FILE")
+
+echo "$TODO_SECTION" \
+  | sed -E "s/^- \[x\](.*)/$GREY - [x]\1$RESET/" \
+  | sed -E "s/^- \[ \](.*)/ - [ ]\1/" \
+  | sed -E "s/\[\[([^]]+)\]\]/$BOLD\1$RESET/g"
+
+echo ""
