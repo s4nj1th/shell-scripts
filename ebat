@@ -1,11 +1,32 @@
 #!/bin/sh
 
-printf "\033[1;34mInput URL:\033[0m "
-read url
+if ! command -v fzf >/dev/null 2>&1; then
+    printf "\033[1;31mError:\033[0m fzf is not installed\n"
+    exit 1
+fi
+
+URL_HISTORY="$HOME/.ebat_history"
+
+touch "$URL_HISTORY" 2>/dev/null
+
+result=$(cat "$URL_HISTORY" 2>/dev/null | fzf --print-query --height=40% --border --prompt="Input URL: ")
+url=$(echo "$result" | tail -1)
+if [ -z "$url" ]; then
+    url=$(echo "$result" | head -1)
+fi
 
 if [ -z "$url" ]; then
     printf "\033[1;31mError:\033[0m No URL provided\n"
     exit 1
+fi
+
+if [ -f "$URL_HISTORY" ]; then
+    grep -v "^$url$" "$URL_HISTORY" > "$URL_HISTORY.tmp"
+    echo "$url" >> "$URL_HISTORY.tmp"
+    mv "$URL_HISTORY.tmp" "$URL_HISTORY"
+    
+    tail -n 100 "$URL_HISTORY" > "$URL_HISTORY.tmp"
+    mv "$URL_HISTORY.tmp" "$URL_HISTORY"
 fi
 
 response=$(curl -s -w "\n%{http_code}" "$url")
