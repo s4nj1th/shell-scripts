@@ -10,15 +10,16 @@ RESET="\x1b[0m"
 BOLD="\x1b[1m"
 
 if [ ! -f "$NOTE_FILE" ]; then
-    echo "No note found for $TODAY at $NOTE_FILE"
+	echo " No note found for $TODAY!"
+	echo ""
     exit 1
 fi
 
 TODO_SECTION=$(awk '/^## todo/{flag=1; next} /^$/{if(flag) exit} flag' "$NOTE_FILE")
 
 echo "$TODO_SECTION" \
-  | sed -E "s/^- \[x\](.*)/$GREY - [x]\1$RESET/" \
-  | sed -E "s/^- \[ \](.*)/ - [ ]\1/" \
+  | sed -E "s/^([[:space:]]*)-[[:space:]]*\[x\][[:space:]]*(.*)/\1$GREY [x] \2$RESET/" \
+  | sed -E "s/^([[:space:]]*)-[[:space:]]*\[ \][[:space:]]*(.*)/\1 [ ] \2/" \
   | sed -E "s/\[\[([^]]+)\]\]/$BOLD\1$RESET/g"
 
 echo ""

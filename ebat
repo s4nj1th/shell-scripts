@@ -1,0 +1,56 @@
+#!/bin/sh
+
+printf "\033[1;34mInput URL:\033[0m "
+read url
+
+if [ -z "$url" ]; then
+    printf "\033[1;31mError:\033[0m No URL provided\n"
+    exit 1
+fi
+
+response=$(curl -s -w "\n%{http_code}" "$url")
+http_code=$(echo "$response" | tail -n1)
+content=$(echo "$response" | sed '$d')
+
+if [ $? -ne 0 ] || [ -z "$content" ]; then
+    printf "\033[1;31mError:\033[0m Failed to connect to URL\n"
+    exit 1
+fi
+
+case $http_code in
+    200)
+        echo "$content" | bat
+        ;;
+    301|302|303|307|308)
+        printf "\033[1;33mWarning:\033[0m Redirect received (HTTP $http_code)\n"
+        echo "$content" | bat
+        ;;
+    400)
+        printf "\033[1;31mError:\033[0m Bad request (HTTP 400)\n"
+        exit 1
+        ;;
+    401)
+        printf "\033[1;31mError:\033[0m Unauthorized (HTTP 401)\n"
+        exit 1
+        ;;
+    403)
+        printf "\033[1;31mError:\033[0m Forbidden (HTTP 403)\n"
+        exit 1
+        ;;
+    404)
+        printf "\033[1;31mError:\033[0m URL not found (HTTP 404)\n"
+        exit 1
+        ;;
+    500|502|503|504)
+        printf "\033[1;31mError:\033[0m Server error (HTTP $http_code)\n"
+        exit 1
+        ;;
+    *)
+        if [ "$http_code" -ge 400 ]; then
+            printf "\033[1;31mError:\033[0m HTTP $http_code\n"
+            exit 1
+        else
+            echo "$content" | bat
+        fi
+        ;;
+esac
